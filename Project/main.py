@@ -123,6 +123,141 @@ def search_shipment():
 
 
 
+def shipment_reports():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    print("\n--- Shipment Reports ---")
+
+    # Total shipments
+    cursor.execute("SELECT COUNT(*) FROM shipments")
+    total = cursor.fetchone()[0]
+    print(f"Total shipments: {total}")
+
+    # Delivered shipments
+    cursor.execute("SELECT COUNT(*) FROM shipments WHERE status = 'Delivered'")
+    delivered = cursor.fetchone()[0]
+    print(f"Delivered shipments: {delivered}")
+
+    # In transit shipments
+    cursor.execute("SELECT COUNT(*) FROM shipments WHERE status = 'In Transit'")
+    in_transit = cursor.fetchone()[0]
+    print(f"In transit shipments: {in_transit}")
+
+    # Show all delayed shipments
+    print("\nDelayed shipments:")
+    cursor.execute("SELECT * FROM shipments WHERE status = 'Delayed'")
+    rows = cursor.fetchall()
+
+    if rows:
+        for row in rows:
+            print(row)
+    else:
+        print("None")
+
+    conn.close()
+
+
+
+def add_inventory():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    item = input("Item name: ")
+    quantity = int(input("Quantity: "))
+    warehouse = int(input("Warehouse ID: "))
+
+    cursor.execute("INSERT INTO inventory (item_name, quantity, warehouse_id) VALUES (?, ?, ?)",
+                   (item, quantity, warehouse))
+
+    conn.commit()
+    conn.close()
+
+    print("Inventory added successfully")
+
+
+
+def view_inventory():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM inventory")
+    rows = cursor.fetchall()
+
+    print("\n--- Inventory ---")
+    for row in rows:
+        print(row)
+
+    conn.close()
+
+
+
+def add_driver():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    name = input("Driver name: ")
+    license_number = input("License number: ")
+    phone = input("Phone: ")
+
+    cursor.execute("INSERT INTO drivers (name, license_number, phone) VALUES (?, ?, ?)",
+                   (name, license_number, phone))
+
+    conn.commit()
+    conn.close()
+
+    print("Driver added successfully")
+
+
+
+def view_drivers():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM drivers")
+    rows = cursor.fetchall()
+
+    print("\n--- Drivers ---")
+    for row in rows:
+        print(row)
+
+    conn.close()
+
+
+
+def add_vehicle():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    capacity = int(input("Vehicle capacity: "))
+    availability = input("Availability (Available/Not Available): ")
+    driver_id = int(input("Assign driver ID: "))
+
+    cursor.execute("INSERT INTO vehicles (capacity, availability, driver_id) VALUES (?, ?, ?)",
+                   (capacity, availability, driver_id))
+
+    conn.commit()
+    conn.close()
+
+    print("Vehicle added successfully")
+
+
+
+def view_vehicles():
+    conn = sqlite3.connect("logistics.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM vehicles")
+    rows = cursor.fetchall()
+
+    print("\n--- Vehicles ---")
+    for row in rows:
+        print(row)
+
+    conn.close()
+
+
+
 def menu():
     while True:
         print("\n--- Logistics System ---")
@@ -131,7 +266,14 @@ def menu():
         print("3. Update Shipment")
         print("4. Delete Shipment")
         print("5. Search Shipment")
-        print("6. Exit")
+        print("6. Shipment Reports")
+        print("7. Add Inventory")
+        print("8. View Inventory")
+        print("9. Add Driver")
+        print("10. View Drivers")
+        print("11. Add Vehicle")
+        print("12. View Vehicles")
+        print("13. Exit")
 
         choice = input("Choose an option: ")
 
@@ -146,10 +288,26 @@ def menu():
         elif choice == "5":
             search_shipment()
         elif choice == "6":
+            shipment_reports()
+        elif choice == "7":
+            add_inventory()
+        elif choice == "8":
+            view_inventory()
+        elif choice == "9":
+            add_driver()
+        elif choice == "10":
+            view_drivers()
+        elif choice == "11":
+            add_vehicle()
+        elif choice == "12":
+            view_vehicles()
+        elif choice == "13":
             print("Exiting system...")
             break
         else:
             print("Invalid choice, try again")
+
+
 
 
 menu()
