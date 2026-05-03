@@ -11,9 +11,9 @@ print("Database connected successfully")
 
 
 # Shipments table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS shipments (shipment_id INTEGER PRIMARY KEY AUTOINCREMENT, order_number TEXT, sender TEXT, receiver TEXT,
-                                      status TEXT, delivery_date TEXT, cost REAL)""")
+cursor.execute("CREATE TABLE IF NOT EXISTS shipments (shipment_id INTEGER PRIMARY KEY AUTOINCREMENT, order_number TEXT, "
+               "sender TEXT, receiver TEXT, status TEXT, delivery_date TEXT, cost REAL, driver_id INTEGER, "
+               "FOREIGN KEY (driver_id) REFERENCES drivers(driver_id))")
 
 
 # Drivers table
@@ -46,9 +46,10 @@ def add_shipment():
     status = input("Status: ")
     delivery_date = input("Delivery date: ")
     cost = float(input("Cost: "))
+    driver_id = int(input("Assign driver ID: "))
 
-    cursor.execute("INSERT INTO shipments (order_number, sender, receiver, status, delivery_date, cost) VALUES (?, ?, ?, ?, ?, ?)",
-                   (order, sender, receiver, status, delivery_date, cost))
+    cursor.execute("INSERT INTO shipments (order_number, sender, receiver, status, delivery_date, cost, driver_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+               (order, sender, receiver, status, delivery_date, cost, driver_id))
 
     conn.commit()
     conn.close()
@@ -61,7 +62,9 @@ def view_shipments():
     conn = sqlite3.connect("logistics.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM shipments")
+    cursor.execute("""SELECT shipments.shipment_id, shipments.order_number, shipments.status, drivers.name FROM shipments
+                      LEFT JOIN drivers ON shipments.driver_id = drivers.driver_id""")
+
     rows = cursor.fetchall()
 
     print("\n--- Shipments ---")
